@@ -1,0 +1,8 @@
+# Binários e Executáveis
+/bin/
+sudosee
+
+# Configurações de IDE e SO
+.vscode/
+.idea/
+.DS_Store
