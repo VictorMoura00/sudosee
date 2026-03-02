@@ -4,7 +4,7 @@
 
 Este projeto foi desenhado para ser uma ferramenta rápida, bonita e prática, mas também serve como um estudo de caso profundo sobre **Arquitetura de Software**, **Concorrência** e **Design de Interfaces para Terminal**.
 
-![SudoSee Screenshot](https://via.placeholder.com/800x400.png?text=Coloque+uma+screenshot+do+SudoSee+aqui)
+![SudoSee Screenshot](./assets/screenshot.png)
 
 ## ✨ Funcionalidades
 
