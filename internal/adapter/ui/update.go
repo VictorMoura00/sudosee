@@ -36,7 +36,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.cursor > 0 {
 				m.cursor--
 			}
-			// Ajusta o scroll subindo
 			if m.cursor < m.offset {
 				m.offset = m.cursor
 			}
@@ -45,7 +44,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.cursor < len(m.processes)-1 {
 				m.cursor++
 			}
-			// Ajusta o scroll descendo
 			if m.cursor >= m.offset+viewLimit {
 				m.offset = m.cursor - viewLimit + 1
 			}

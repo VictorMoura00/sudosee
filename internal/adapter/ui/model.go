@@ -11,7 +11,6 @@ import (
 
 type tickMsg time.Time
 
-// Constante para o limite de linhas da tabela
 const viewLimit = 15
 
 type Model struct {

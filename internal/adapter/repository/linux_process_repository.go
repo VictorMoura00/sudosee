@@ -14,7 +14,7 @@ const linuxClockTicks float64 = 100.0
 
 type LinuxProcessRepository struct {
 	pageSize uint64
-	users    map[string]string // Cache de UID -> Username
+	users    map[string]string
 }
 
 func NewLinuxProcessRepository() *LinuxProcessRepository {
@@ -22,11 +22,10 @@ func NewLinuxProcessRepository() *LinuxProcessRepository {
 		pageSize: uint64(os.Getpagesize()),
 		users:    make(map[string]string),
 	}
-	repo.loadUsers() // Carrega os usuários na inicialização (Performance/DRY)
+	repo.loadUsers()
 	return repo
 }
 
-// NOVO: Lê /etc/passwd uma vez e guarda em memória
 func (r *LinuxProcessRepository) loadUsers() {
 	data, err := os.ReadFile("/etc/passwd")
 	if err == nil {
@@ -34,7 +33,7 @@ func (r *LinuxProcessRepository) loadUsers() {
 		for _, line := range lines {
 			parts := strings.Split(line, ":")
 			if len(parts) >= 3 {
-				r.users[parts[2]] = parts[0] // Ex: map["1000"] = "VictorMoura"
+				r.users[parts[2]] = parts[0]
 			}
 		}
 	}
@@ -115,7 +114,6 @@ func (r *LinuxProcessRepository) parseStat(pid int, sysUptime float64) (domain.P
 		}
 	}
 
-	// NOVO: Descobrir o dono do processo lendo o arquivo status
 	userName := "unknown"
 	statusData, err := os.ReadFile(fmt.Sprintf("/proc/%d/status", pid))
 	if err == nil {
@@ -126,9 +124,9 @@ func (r *LinuxProcessRepository) parseStat(pid int, sysUptime float64) (domain.P
 				if len(uidParts) > 1 {
 					uidStr := uidParts[1]
 					if name, exists := r.users[uidStr]; exists {
-						userName = name // Achou no cache
+						userName = name
 					} else {
-						userName = uidStr // Fallback para o número caso não ache
+						userName = uidStr
 					}
 				}
 				break
@@ -141,7 +139,7 @@ func (r *LinuxProcessRepository) parseStat(pid int, sysUptime float64) (domain.P
 		PPID:   ppid,
 		Name:   name,
 		State:  state,
-		User:   userName, // Atribui o usuário final
+		User:   userName,
 		Memory: memoryBytes,
 		CPU:    cpuUsage,
 	}, nil
@@ -192,11 +190,9 @@ func (r *LinuxProcessRepository) Terminate(pid int) error {
 	return proc.Kill()
 }
 
-// NOVO: Coleta os dados globais do sistema para o Dashboard
 func (r *LinuxProcessRepository) GetSystemStats() (domain.SystemStats, error) {
 	var stats domain.SystemStats
 
-	// Lê Memória (em kB, multiplicamos por 1024 para virar Bytes)
 	memData, err := os.ReadFile("/proc/meminfo")
 	if err == nil {
 		var available uint64
@@ -214,7 +210,6 @@ func (r *LinuxProcessRepository) GetSystemStats() (domain.SystemStats, error) {
 		stats.UsedRAM = stats.TotalRAM - available
 	}
 
-	// Lê Carga do Sistema (Load Average 1 min)
 	loadData, err := os.ReadFile("/proc/loadavg")
 	if err == nil {
 		stats.LoadAvg = strings.Fields(string(loadData))[0]
